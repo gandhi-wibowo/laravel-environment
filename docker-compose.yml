@@ -1,0 +1,37 @@
+version: '2'
+services:
+  php-fpm:
+      container_name: fpm-laravel-environment
+      restart: always
+      build:
+        context: .
+        dockerfile: Dockerfile
+      ports:
+        - 9000:9000
+      links:
+        - postgre        
+      volumes:
+        - ./project:/var/www
+  nginx:
+      image: nginx
+      container_name: nginx-laravel-environment
+      restart: always
+      ports:
+        - 80:80
+      links:
+        - php-fpm
+      volumes:
+        - ./project:/var/www
+        - ./docker-config:/etc/nginx/conf.d/
+  postgre:
+    image: postgres:14-alpine
+    container_name: postgre-laravel-environment
+    ports:
+      - 5432:5432
+    volumes:
+      - ./database:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: laravel_db ## db name
+      POSTGRES_USER: root ## db user
+      POSTGRES_PASSWORD: D1zC0din9 ## db password
+    restart: unless-stopped
